@@ -5,7 +5,7 @@ import argparse
 from lib.converter import convert, proceed
 from lib.network import Network
 from lib.generator import Generator
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, TensorBoard
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -17,8 +17,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-BATCH_SIZE = 1024
-HIDDEN_SIZE = 256
+BATCH_SIZE = 2048
+HIDDEN_SIZE = 512
 FEATURE_SIZE = 840
 LABEL_SIZE = 137
 
@@ -31,7 +31,7 @@ elif args.mode == 'summary':
   network.model.summary()
 elif args.mode == 'train':
   network = Network(BATCH_SIZE, HIDDEN_SIZE, FEATURE_SIZE, LABEL_SIZE)
-  network.model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+  network.model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy', 'top_k_categorical_accuracy'])
   generator = Generator(LABEL_SIZE, './data/train_data.npz')
   val = Generator(LABEL_SIZE, './data/val_data.npz')
   network.model.fit_generator(
@@ -41,7 +41,8 @@ elif args.mode == 'train':
     steps_per_epoch=128,
     epochs=1024,
     callbacks=[
-      ModelCheckpoint(filepath="./weights.hdf5", save_weights_only=True)
+      ModelCheckpoint(filepath="./weights.hdf5", save_weights_only=True, save_best_only=True),
+      TensorBoard(log_dir='./logs'),
     ]
   )
 elif args.mode == 'predict':

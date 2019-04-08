@@ -13,6 +13,7 @@ class Generator:
       data = np.load(file)
       self.x, self.y = data['x'], data['y']
       self.size = data['x'].shape[0]
+      print(self.size)
 
   def generate_batch(self):
     idx = randint(0, self.size-1)
