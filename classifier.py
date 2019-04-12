@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import numpy as np
+from scipy.spatial import distance_matrix
 
 from lib.converter import convert, proceed
 from lib.network import Network
@@ -12,7 +14,7 @@ parser.add_argument(
   'mode',
   type=str,
   help='',
-  choices=['train', 'convert', 'proceed' , 'summary', 'predict']
+  choices=['train', 'convert' , 'summary', 'predict']
 )
 
 args = parser.parse_args()
@@ -24,8 +26,6 @@ LABEL_SIZE = 137
 
 if args.mode == 'convert':
   convert()
-elif args.mode == 'proceed':
-  proceed()
 elif args.mode == 'summary':
   network = Network(BATCH_SIZE, HIDDEN_SIZE, FEATURE_SIZE, LABEL_SIZE)
   network.model.summary()
@@ -47,3 +47,8 @@ elif args.mode == 'train':
   )
 elif args.mode == 'predict':
   network = Network(BATCH_SIZE, HIDDEN_SIZE, FEATURE_SIZE, LABEL_SIZE)
+  network.model.load_weights('./weights.hdf5')
+  mat = np.nan_to_num(proceed())
+  res = network.model.predict(mat, batch_size=20)
+  distance = distance_matrix(res, res)
+  np.savetxt("result.csv", distance, delimiter=",", fmt='%10.12f')
