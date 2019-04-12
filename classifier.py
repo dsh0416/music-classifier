@@ -8,6 +8,7 @@ from lib.converter import convert, proceed
 from lib.network import Network
 from lib.generator import Generator
 from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.models import Model
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -48,7 +49,10 @@ elif args.mode == 'train':
 elif args.mode == 'predict':
   network = Network(BATCH_SIZE, HIDDEN_SIZE, FEATURE_SIZE, LABEL_SIZE)
   network.model.load_weights('./weights.hdf5')
+  feature_extraction = Model(inputs=network.model.input, outputs=network.model.get_layer('hidden').output)
   mat = np.nan_to_num(proceed())
-  res = network.model.predict(mat, batch_size=20)
+  res = feature_extraction.predict(mat, batch_size=20)
   distance = distance_matrix(res, res)
+  max_val = np.amax(distance)
+  distance = distance / max_val * 100.0
   np.savetxt("result.csv", distance, delimiter=",", fmt='%10.12f')

@@ -22,7 +22,7 @@ class Network:
     hidden = Dense(self.hidden_size // 2, activation='relu')(hidden)
     hidden = Dropout(0.5)(hidden)
     hidden = BatchNormalization()(hidden)
-    hidden = Dense(self.hidden_size // 4, activation='relu')(hidden)
+    hidden = Dense(self.hidden_size // 4, activation='relu', name='hidden')(hidden)
 
     output = Dense(self.label_size, activation='softmax')(hidden)
     return Model([wav], [output])

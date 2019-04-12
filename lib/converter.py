@@ -19,6 +19,7 @@ def proceed():
   for i in range(1, 21):
     mfcc.get_mfccs(filename='./audio/' + str(i) + '.wav')
     rhy = feature_loader.get_op_from_melspec(mfcc.melspec, K=2).T[0]
+    rhy = (rhy - np.nanmean(rhy)) / np.nanstd(rhy)
     mel = feature_loader.get_pb_for_file('./csvfiles/melody/' + str(i) + '.csv').T[0]
     mel = (mel - np.nanmean(mel)) / np.nanstd(mel)
     mfc = feature_loader.get_mfcc_from_melspec(mfcc.melspec).T[0] 
